@@ -1,0 +1,155 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "nakasyou/moonscratch"
+
+// Values
+pub fn default_vm_options() -> VmOptions
+
+pub fn vm_broadcast(Vm, String) -> Unit
+
+pub fn vm_green_flag(Vm) -> Unit
+
+pub fn vm_new(ProjectBundle, VmOptions) -> Vm raise VmError
+
+pub fn vm_new_from_json(String, assets_json? : String, options_json? : String) -> Vm raise VmError
+
+pub fn vm_post_io_json(Vm, String, String) -> Unit
+
+pub fn vm_snapshot_json(Vm) -> String
+
+pub fn vm_start(Vm) -> Unit
+
+pub fn vm_step(Vm, Int) -> StepReport
+
+pub fn vm_stop_all(Vm) -> Unit
+
+pub fn vm_take_effects_json(Vm) -> String
+
+// Errors
+pub suberror VmError {
+  InvalidProject(String)
+}
+
+// Types and methods
+pub(all) struct ControlFrame {
+  kind : ControlFrameKind
+  mut remaining : Int
+  substack : String?
+  after : String?
+}
+pub impl Eq for ControlFrame
+pub impl Show for ControlFrame
+pub impl ToJson for ControlFrame
+
+pub enum ControlFrameKind {
+  Repeat
+  Forever
+}
+pub impl Eq for ControlFrameKind
+pub impl Show for ControlFrameKind
+pub impl ToJson for ControlFrameKind
+
+pub enum HostEffect {
+  PlaySound(String, String)
+  StopAllSounds
+  Say(String, String)
+  Think(String, String)
+  Ask(String)
+  Broadcast(String)
+  Log(String, String)
+}
+pub impl Eq for HostEffect
+pub impl Show for HostEffect
+pub impl ToJson for HostEffect
+
+pub(all) struct ProjectBundle {
+  project_json : String
+  assets : Map[String, Json]
+}
+pub impl Eq for ProjectBundle
+pub impl Show for ProjectBundle
+pub impl ToJson for ProjectBundle
+
+pub(all) struct ScratchBlock {
+  id : String
+  opcode : String
+  next : String?
+  parent : String?
+  inputs : Map[String, Json]
+  fields : Map[String, Json]
+  top_level : Bool
+}
+pub impl Eq for ScratchBlock
+pub impl Show for ScratchBlock
+pub impl ToJson for ScratchBlock
+
+pub(all) struct StepReport {
+  now_ms : Int
+  active_threads : Int
+  stepped_threads : Int
+  emitted_effects : Int
+}
+pub impl Eq for StepReport
+pub impl Show for StepReport
+pub impl ToJson for StepReport
+
+pub(all) struct TargetState {
+  id : String
+  name : String
+  is_stage : Bool
+  mut x : Double
+  mut y : Double
+  mut direction : Double
+  mut size : Double
+  mut visible : Bool
+  mut current_costume : Int
+  variables : Map[String, Json]
+  variable_names : Map[String, String]
+  lists : Map[String, Array[Json]]
+  list_names : Map[String, String]
+  blocks : Map[String, ScratchBlock]
+  top_level_hats : Array[String]
+}
+
+pub(all) struct Thread {
+  id : Int
+  target_index : Int
+  mut pc : String?
+  mut wait_until_ms : Int?
+  mut wait_for_input : String?
+  mut done : Bool
+  mut stack : Array[ControlFrame]
+  parent_waiter : Int?
+}
+
+pub(all) struct Vm {
+  targets : Array[TargetState]
+  stage_index : Int
+  assets : Map[String, Json]
+  options : VmOptions
+  mut threads : Array[Thread]
+  mut next_thread_id : Int
+  mut run_id : Int
+  mut now_ms : Int
+  mut running : Bool
+  mut answer : String
+  mut effects : Array[HostEffect]
+  mut io_state : Map[String, Json]
+  mut waiting_children : Map[Int, Int]
+  mut rng_state : Int
+}
+
+pub(all) struct VmOptions {
+  mut turbo : Bool
+  mut compatibility_30tps : Bool
+  mut max_clones : Int
+  mut deterministic : Bool
+  mut seed : Int
+}
+pub impl Eq for VmOptions
+pub impl Show for VmOptions
+pub impl ToJson for VmOptions
+
+// Type aliases
+
+// Traits
+
