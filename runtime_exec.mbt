@@ -80,6 +80,80 @@ fn hat_broadcast_name(block : ScratchBlock) -> String {
 }
 
 ///|
+fn block_clone_option(
+  vm : Vm,
+  target_index : Int,
+  block : ScratchBlock,
+) -> String {
+  let from_input = json_to_string_value(
+    value_from_input(vm, target_index, block, "CLONE_OPTION", 0),
+  )
+  if from_input != "" {
+    return from_input
+  }
+  match field_value(block, "CLONE_OPTION") {
+    Some((name, _)) => name
+    None => ""
+  }
+}
+
+///|
+fn find_clone_source_target(vm : Vm, current_target_index : Int, name : String) -> Int? {
+  if name == "_myself_" {
+    if current_target_index >= 0 &&
+      current_target_index < vm.targets.length() &&
+      !vm.targets[current_target_index].deleted {
+      return Some(current_target_index)
+    }
+    return None
+  }
+
+  for i, target in vm.targets {
+    if !target.deleted &&
+      !target.is_stage &&
+      target.is_original &&
+      target.name == name {
+      return Some(i)
+    }
+  }
+  for i, target in vm.targets {
+    if !target.deleted && !target.is_stage && target.name == name {
+      return Some(i)
+    }
+  }
+  None
+}
+
+///|
+fn spawn_clone_start_hats(vm : Vm, target_index : Int) -> Int {
+  if target_index < 0 || target_index >= vm.targets.length() {
+    return 0
+  }
+  let target = vm.targets[target_index]
+  if target.deleted {
+    return 0
+  }
+
+  let mut count = 0
+  for hat_id in target.top_level_hats {
+    match target.blocks.get(hat_id) {
+      Some(hat) =>
+        if hat.opcode == "control_start_as_clone" {
+          match hat.next {
+            Some(start) => {
+              spawn_thread(vm, target_index, start, None)
+              count += 1
+            }
+            None => ()
+          }
+        }
+      None => ()
+    }
+  }
+  count
+}
+
+///|
 fn spawn_hats_for_message(
   vm : Vm,
   message : String,
@@ -87,6 +161,9 @@ fn spawn_hats_for_message(
 ) -> Int {
   let mut count = 0
   for target_index, target in vm.targets {
+    if target.deleted {
+      continue
+    }
     for hat_id in target.top_level_hats {
       match target.blocks.get(hat_id) {
         Some(hat) =>
@@ -111,6 +188,9 @@ fn spawn_hats_for_message(
 fn spawn_green_flag_hats(vm : Vm) -> Int {
   let mut count = 0
   for target_index, target in vm.targets {
+    if target.deleted {
+      continue
+    }
     for hat_id in target.top_level_hats {
       match target.blocks.get(hat_id) {
         Some(hat) =>
@@ -303,6 +383,14 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
   }
 
   let target_index = thread.target_index
+  if target_index < 0 || target_index >= vm.targets.length() {
+    thread.done = true
+    return thread
+  }
+  if vm.targets[target_index].deleted {
+    thread.done = true
+    return thread
+  }
   let target = vm.targets[target_index]
   let block = match target.blocks.get(block_id) {
     Some(value) => value
@@ -493,6 +581,14 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
       let duration = if duration_raw < 0.0 { 0.0 } else { duration_raw }
       thread.wait_until_ms = Some(vm.now_ms + (duration * 1000.0).to_int())
     }
+    "control_wait_until" => {
+      let condition = json_to_bool_value(
+        value_from_input(vm, target_index, block, "CONDITION", 0),
+      )
+      if !condition {
+        next_pc = Some(block.id)
+      }
+    }
     "control_repeat" => {
       let times = json_to_number_value(
           value_from_input(vm, target_index, block, "TIMES", 0),
@@ -505,6 +601,53 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
         next_pc = substack
       }
     }
+    "control_repeat_until" => {
+      let condition = json_to_bool_value(
+        value_from_input(vm, target_index, block, "CONDITION", 0),
+      )
+      if !condition {
+        let substack = block_input_block_id(block, "SUBSTACK")
+        thread.stack.push(repeat_frame(1, substack, Some(block.id)))
+        next_pc = substack
+      }
+    }
+    "control_while" => {
+      let condition = json_to_bool_value(
+        value_from_input(vm, target_index, block, "CONDITION", 0),
+      )
+      if condition {
+        let substack = block_input_block_id(block, "SUBSTACK")
+        thread.stack.push(repeat_frame(1, substack, Some(block.id)))
+        next_pc = substack
+      }
+    }
+    "control_for_each" =>
+      match field_value(block, "VARIABLE") {
+        Some((name, id)) => {
+          let limit = json_to_number_value(
+            value_from_input(vm, target_index, block, "VALUE", 0),
+          )
+          let key = "for_each:\{block.id}"
+          let index = thread.loop_counters.get_or_default(key, 0)
+          if Double::from_int(index) < limit {
+            let next_index = index + 1
+            thread.loop_counters[key] = next_index
+            write_variable(
+              vm,
+              target_index,
+              id,
+              Some(name),
+              json_number(Double::from_int(next_index)),
+            )
+            let substack = block_input_block_id(block, "SUBSTACK")
+            thread.stack.push(repeat_frame(1, substack, Some(block.id)))
+            next_pc = substack
+          } else {
+            thread.loop_counters.remove(key)
+          }
+        }
+        None => ()
+      }
     "control_forever" => {
       let substack = block_input_block_id(block, "SUBSTACK")
       thread.stack.push(forever_frame(substack))
@@ -514,21 +657,28 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
       let condition = json_to_bool_value(
         value_from_input(vm, target_index, block, "CONDITION", 0),
       )
-      next_pc = if condition {
-        block_input_block_id(block, "SUBSTACK")
-      } else {
-        block.next
+      if condition {
+        let substack = block_input_block_id(block, "SUBSTACK")
+        thread.stack.push(repeat_frame(1, substack, block.next))
+        next_pc = substack
       }
     }
     "control_if_else" => {
       let condition = json_to_bool_value(
         value_from_input(vm, target_index, block, "CONDITION", 0),
       )
-      next_pc = if condition {
+      let branch = if condition {
         block_input_block_id(block, "SUBSTACK")
       } else {
         block_input_block_id(block, "SUBSTACK2")
       }
+      thread.stack.push(repeat_frame(1, branch, block.next))
+      next_pc = branch
+    }
+    "control_all_at_once" => {
+      let substack = block_input_block_id(block, "SUBSTACK")
+      thread.stack.push(repeat_frame(1, substack, block.next))
+      next_pc = substack
     }
     "control_stop" => {
       let option = json_to_string_value(
@@ -537,16 +687,39 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
       if option == "all" {
         clear_threads(vm)
         push_effect(vm, HostEffect::StopAllSounds)
-      } else if option == "other scripts in sprite" {
+      } else if option == "other scripts in sprite" ||
+        option == "other scripts in stage" {
         kill_other_scripts_for_target(vm, target_index, thread.id)
       }
       if option == "this script" ||
         option == "all" ||
-        option == "other scripts in sprite" {
+        option == "other scripts in sprite" ||
+        option == "other scripts in stage" {
         thread.done = true
       }
     }
-    "control_delete_this_clone" => thread.done = true
+    "control_create_clone_of" => {
+      let option = block_clone_option(vm, target_index, block)
+      if option != "" {
+        match find_clone_source_target(vm, target_index, option) {
+          Some(source_index) =>
+            match spawn_clone_target(vm, source_index) {
+              Some(clone_target_index) =>
+                ignore(spawn_clone_start_hats(vm, clone_target_index))
+              None => ()
+            }
+          None => ()
+        }
+      }
+    }
+    "control_delete_this_clone" => {
+      if !vm.targets[target_index].is_original && !vm.targets[target_index].is_stage {
+        dispose_clone_target(vm, target_index, thread.id)
+        thread.done = true
+      }
+    }
+    "control_clear_counter" => vm.control_counter = 0
+    "control_incr_counter" => vm.control_counter += 1
     "event_broadcast" => {
       let message = block_broadcast_name(vm, target_index, block)
       if message != "" {
@@ -572,6 +745,7 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
       thread.wait_for_input = Some("answer")
     }
     "sensing_setdragmode"
+    | "control_start_as_clone"
     | "event_whenflagclicked"
     | "event_whenbroadcastreceived" => ()
     _ =>
@@ -601,6 +775,7 @@ fn start_vm_runtime(vm : Vm) -> Unit {
 ///|
 fn green_flag_runtime(vm : Vm) -> Unit {
   clear_threads(vm)
+  reset_targets_for_green_flag(vm)
   vm.run_id += 1
   vm.running = true
   let spawned = spawn_green_flag_hats(vm)

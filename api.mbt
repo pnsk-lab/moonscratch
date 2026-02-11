@@ -98,7 +98,12 @@ fn target_snapshot_json(target : TargetState) -> Json {
 
 ///|
 fn snapshot_to_json(vm : Vm) -> Json {
-  let targets = vm.targets.map(target_snapshot_json)
+  let targets = []
+  for target in vm.targets {
+    if !target.deleted {
+      targets.push(target_snapshot_json(target))
+    }
+  }
   json_object({
     "runId": json_number(Double::from_int(vm.run_id)),
     "nowMs": json_number(Double::from_int(vm.now_ms)),

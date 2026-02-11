@@ -49,3 +49,16 @@ You can browse and install extra skills here:
   behavior. For solid, well-defined results (e.g. scientific computations),
   prefer assertion tests. You can use `moon coverage analyze > uncovered.log` to
   see which parts of your code are not covered by tests.
+
+## Commit & Pull Request Guidelines
+
+- Commit messages follow Conventional Commit-style prefixes (e.g., `feat:`, `fix:`, `rename:`, `feat(blocks):`). Keep them concise and action-oriented.
+- PRs should include a clear summary, link relevant issues/PRs, and add screenshots/GIFs for visible UI changes in `examples/example1`.
+* If you are Codex, use `Co-authored-by: chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>` in the commit message to credit the human collaborator.
+  * You have to add `--author="chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --no-gpg-sign` option to git commit command.
+  Example:
+  ```sh
+    git commit -m "fix: correct minor typos in code\n\nCo-authored-by: chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --author="chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --no-gpg-sign
+    ```
+* You can use git command and gh command to commit, push and create PR.
+* Use "Squash and merge" to merge the PR on GitHub.

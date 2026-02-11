@@ -219,6 +219,11 @@ fn eval_reporter_block_depth(
         Some((value, _)) => json_string(value)
         None => json_string("")
       }
+    "control_create_clone_of_menu" =>
+      match field_value(block, "CLONE_OPTION") {
+        Some((value, _)) => json_string(value)
+        None => json_string("")
+      }
     "operator_add" => {
       let left = json_to_number_value(
         value_from_input(vm, target_index, block, "NUM1", depth),
@@ -385,6 +390,7 @@ fn eval_reporter_block_depth(
     }
     "sensing_answer" => json_string(vm.answer)
     "sensing_timer" => json_number(Double::from_int(vm.now_ms) / 1000.0)
+    "control_get_counter" => json_number(Double::from_int(vm.control_counter))
     "data_variable" =>
       match field_value(block, "VARIABLE") {
         Some((name, id)) => read_variable(vm, target_index, id, Some(name))

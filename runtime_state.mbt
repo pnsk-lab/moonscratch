@@ -19,6 +19,8 @@ fn vm_new_internal(
     io_state: {},
     waiting_children: {},
     rng_state: options.seed,
+    control_counter: 0,
+    next_clone_id: 1,
   }
 }
 
@@ -199,6 +201,144 @@ fn with_list_mut(
 }
 
 ///|
+fn copy_json_map(source : Map[String, Json]) -> Map[String, Json] {
+  let out = {}
+  source.each((key, value) => out[key] = value)
+  out
+}
+
+///|
+fn copy_string_map(source : Map[String, String]) -> Map[String, String] {
+  let out = {}
+  source.each((key, value) => out[key] = value)
+  out
+}
+
+///|
+fn copy_list_map(
+  source : Map[String, Array[Json]],
+) -> Map[String, Array[Json]] {
+  let out = {}
+  source.each((key, value) => out[key] = value.copy())
+  out
+}
+
+///|
+fn copy_block_map(
+  source : Map[String, ScratchBlock],
+) -> Map[String, ScratchBlock] {
+  let out = {}
+  source.each((key, value) => out[key] = value)
+  out
+}
+
+///|
+fn active_clone_count(vm : Vm) -> Int {
+  let mut count = 0
+  for target in vm.targets {
+    if !target.is_stage && !target.is_original && !target.deleted {
+      count += 1
+    }
+  }
+  count
+}
+
+///|
+fn find_reusable_clone_slot(vm : Vm) -> Int? {
+  for i, target in vm.targets {
+    if !target.is_stage && !target.is_original && target.deleted {
+      return Some(i)
+    }
+  }
+  None
+}
+
+///|
+fn clone_target_state(source : TargetState, clone_id : Int) -> TargetState {
+  {
+    id: "\{source.id}#clone_\{clone_id}",
+    name: source.name,
+    is_stage: source.is_stage,
+    is_original: false,
+    deleted: false,
+    x: source.x,
+    y: source.y,
+    direction: source.direction,
+    size: source.size,
+    visible: source.visible,
+    current_costume: source.current_costume,
+    variables: copy_json_map(source.variables),
+    variable_names: copy_string_map(source.variable_names),
+    lists: copy_list_map(source.lists),
+    list_names: copy_string_map(source.list_names),
+    blocks: copy_block_map(source.blocks),
+    top_level_hats: source.top_level_hats.copy(),
+  }
+}
+
+///|
+fn spawn_clone_target(vm : Vm, source_index : Int) -> Int? {
+  if source_index < 0 || source_index >= vm.targets.length() {
+    return None
+  }
+  let source = vm.targets[source_index]
+  if source.is_stage || source.deleted {
+    return None
+  }
+  if active_clone_count(vm) >= vm.options.max_clones {
+    return None
+  }
+
+  let clone_id = vm.next_clone_id
+  vm.next_clone_id += 1
+  let clone_target = clone_target_state(source, clone_id)
+
+  match find_reusable_clone_slot(vm) {
+    Some(slot) => {
+      vm.targets[slot] = clone_target
+      Some(slot)
+    }
+    None => {
+      vm.targets.push(clone_target)
+      Some(vm.targets.length() - 1)
+    }
+  }
+}
+
+///|
+fn dispose_clone_target(
+  vm : Vm,
+  target_index : Int,
+  current_thread_id : Int,
+) -> Unit {
+  if target_index < 0 || target_index >= vm.targets.length() {
+    return
+  }
+  let target = vm.targets[target_index]
+  if target.is_stage || target.is_original || target.deleted {
+    return
+  }
+  vm.targets[target_index].deleted = true
+  vm.targets[target_index].visible = false
+  for i, thread in vm.threads {
+    if thread.target_index == target_index && thread.id != current_thread_id {
+      vm.threads[i].done = true
+    }
+  }
+}
+
+///|
+fn reset_targets_for_green_flag(vm : Vm) -> Unit {
+  for i, target in vm.targets {
+    if target.is_original {
+      vm.targets[i].deleted = false
+    } else {
+      vm.targets[i].deleted = true
+    }
+  }
+}
+
+///|
 fn spawn_thread(
   vm : Vm,
   target_index : Int,
@@ -215,6 +355,7 @@ fn spawn_thread(
     wait_for_input: None,
     done: false,
     stack: [],
+    loop_counters: {},
     parent_waiter,
   }
   vm.threads.push(thread)

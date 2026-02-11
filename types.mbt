@@ -70,6 +70,8 @@ pub(all) struct TargetState {
   id : String
   name : String
   is_stage : Bool
+  is_original : Bool
+  mut deleted : Bool
   mut x : Double
   mut y : Double
   mut direction : Double
@@ -93,6 +95,7 @@ pub(all) struct Thread {
   mut wait_for_input : String?
   mut done : Bool
   mut stack : Array[ControlFrame]
+  mut loop_counters : Map[String, Int]
   parent_waiter : Int?
 }
 
@@ -112,6 +115,8 @@ pub(all) struct Vm {
   mut io_state : Map[String, Json]
   mut waiting_children : Map[Int, Int]
   mut rng_state : Int
+  mut control_counter : Int
+  mut next_clone_id : Int
 }
 
 ///|

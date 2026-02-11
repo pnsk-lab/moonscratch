@@ -6,7 +6,8 @@ fn is_hat_opcode(opcode : String) -> Bool {
   opcode == "event_whenthisspriteclicked" ||
   opcode == "event_whenstageclicked" ||
   opcode == "event_whenbackdropswitchesto" ||
-  opcode == "event_whengreaterthan"
+  opcode == "event_whengreaterthan" ||
+  opcode == "control_start_as_clone"
 }
 
 ///|
@@ -129,6 +130,8 @@ fn parse_target(index : Int, json : Json) -> TargetState raise VmError {
     id: target_id,
     name,
     is_stage,
+    is_original: true,
+    deleted: false,
     x,
     y,
     direction,
