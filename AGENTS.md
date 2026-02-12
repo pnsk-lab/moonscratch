@@ -17,6 +17,11 @@ You can browse and install extra skills here:
 
 * src/ にあるテストはユニットテストのみで、マクロなテストは test/ に書く
 
+## AGENTS.md Maintenance
+
+- AGENTS.md はルートだけでなく、責務が分かれる主要ディレクトリにも配置する。
+- エージェントはプロジェクト構成や運用ルールの変更を検知したら、関連する AGENTS.md を必要に応じて自律的に更新し、現状と乖離させない。
+
 ## Coding convention
 
 - MoonBit code is organized in block style, each block is separated by `///|`,
