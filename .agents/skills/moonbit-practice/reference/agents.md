@@ -1,6 +1,8 @@
 ----
 title: MoonBit Project Layouts
-----
+---
+
+-
 
 # MoonBit Project Layouts
 
@@ -16,7 +18,7 @@ Here are some typical project layouts you may encounter:
 
 - **Module**: When you see a `moon.mod.json` file in the project directory, you
   are already in a MoonBit project.
-  A MoonBit *module* is like a Go module.
+  A MoonBit _module_ is like a Go module.
   It is a collection of packages, usually corresponding to a repository or project.
   Module boundaries matter for dependency management and import paths.
   A module contains many packages in subdirectories.
@@ -25,7 +27,7 @@ Here are some typical project layouts you may encounter:
   file, it means you are in a MoonBit package. All subcommands of `moon` will
   still be executed in the directory of the module (where `moon.mod.json` is
   located), not the current package.
-  A MoonBit *package* is the actual compilation unit (like a Go package).
+  A MoonBit _package_ is the actual compilation unit (like a Go package).
   All source files in the same package are concatenated into one unit.
   The `package` name in the source defines the package, not the file name.
   Imports refer to module + package paths, NEVER to file names.
@@ -56,7 +58,7 @@ Here are some typical project layouts you may encounter:
    - Avoid creating giant “misc” or “util” files.
 
 5. Tests:
-   - Place tests in dedicated test files (e.g. *_test.mbt) within the appropriate package.
+   - Place tests in dedicated test files (e.g. \*\_test.mbt) within the appropriate package.
    - It is fine—and encouraged—to have multiple small test files.
 
 ## `.mbti` Files - Package Interface Documentation
@@ -80,14 +82,17 @@ $ tree -P '*.mbti' -I 'internal' --prune ~/.moon/lib/core # ignore internal pack
 ```
 
 **When to use each approach**:
+
 - Use `moon doc` for interactive API discovery (preferred, see "API Discovery with `moon doc`" section below)
 - Read `.mbti` files directly when you need the complete API surface at once or when working offline
 
 **Reading `.mbti` files for API discovery**:
+
 - **Start with `builtin/pkg.generated.mbti`** - contains core types (String, Int, Array, etc.) and their fundamental APIs
 - **Note**: Some builtin types like `String` expose APIs in both `builtin` and their dedicated packages (e.g., `String`)
 - **Local dependencies**: Find `.mbti` files in the `.mooncakes` directory by searching for `pkg.generated.mbti`
 - **Your own packages**: After running `moon info`, check the generated `.mbti` in each package directory to verify public API changes
+
 # MoonBit Language Fundamentals
 
 ## Core Facts
@@ -104,8 +109,8 @@ Core facts that impact how you write and refactor code.
 - **Placeholders**: `...` is a valid placeholder in MoonBit code for incomplete implementations.
 - **Global values**: immutable by default and generally require type annotations.
 - **Garbage collection**: MoonBit has a GC, there is no lifetime annotation, there's no ownership system.
-<Important> Delimit top-level items with `///|` comments so tools can split the file reliably.
-</Important>
+  <Important> Delimit top-level items with `///|` comments so tools can split the file reliably.
+  </Important>
 
 Quick reference:
 
@@ -259,6 +264,7 @@ test "integer and char literal overloading disambiguation via type in the curren
   let a2 : Char = 'b'
 }
 ```
+
 ## Bytes
 
 Bytes is immutable; Indexing (`b[i]`) returns a `Byte`.
@@ -271,6 +277,7 @@ test "bytes literals overloading and indexing" {
   assert_eq(b0[0], b'a') // indexing returns Byte
 }
 ```
+
 ## Array
 
 MoonBit Array is resizable array, FixedArray is fixed size array.
@@ -659,7 +666,7 @@ fn g(
   // make sure you understand the types of the arguments really is:
   let _ : Int = positional
   let _ : Int = required
-  // let _ : Option[Int] = optional 
+  // let _ : Option[Int] = optional
   let _ : Int = optional_with_default
   "\{positional},\{required},\{optional},\{optional_with_default}"
 }
@@ -685,7 +692,7 @@ test {
 }
 ```
 
-Anti pattern: `arg? : Type?` 
+Anti pattern: `arg? : Type?`
 
 ```mbt
 // How to fix: declare `(a? : Int, b? : Int = 1)` directly
@@ -1223,7 +1230,7 @@ let data : String =
 Write documentation using `///` comments (started with `///|` to delimit the
 block code)
 
-```mbt check
+````mbt check
 ///|
 /// Get the largest element of a non-empty `Array`.
 ///
@@ -1239,7 +1246,7 @@ block code)
 pub fn sum_array(xs : Array[Int]) -> Int {
   xs.fold(init=0, (a, b) => a + b)
 }
-```
+````
 
 The MoonBit code in docstring will be type checked and tested automatically.
 (using `moon test --update`)
@@ -1299,12 +1306,12 @@ The MoonBit code in docstring will be type checked and tested automatically.
 
 ## MoonBit Package `README` Generation Guide
 
-- Output `README.mbt.md` in the package directory. 
+- Output `README.mbt.md` in the package directory.
   `*.mbt.md` file and docstring contents treats `mbt check` specially.
-  `mbt check` block will be included directly as code and also run by `moon check` and `moon test`. 
+  `mbt check` block will be included directly as code and also run by `moon check` and `moon test`.
   In docstrings, `mbt check` should only contain test blocks.
   If you are only referencing types from the package, you should use `mbt` which will only be syntax highlighted.
-  Symlink `README.mbt.md` to `README.md` to adapt to systems that expect `README.md`. 
+  Symlink `README.mbt.md` to `README.md` to adapt to systems that expect `README.md`.
 - Aim to cover ≥90% of the public API with concise sections and examples.
 - Organize by feature: construction, consumption, transformation, and key usage tips.
 
@@ -1336,6 +1343,7 @@ pub fn Yaml::to_string(y : Yaml) -> String raise {...}
 #declaration_only
 pub fn parse_yaml(s : String) -> Yaml raise {...}
 ```
+
 - Add `spec_easy_test.mbt`, `spec_difficult_test.mbt` etc to test the spec functions; everything will be type-checked.
 - The AI or students can implement the `declaration_only` functions in different files thanks to our package organization.
 - Run `moon test` to check everything is correct.
@@ -1353,14 +1361,13 @@ pub fn parse_yaml(s : String) -> Yaml raise {...}
 ### Query Syntax
 
 `moon doc` uses a specialized query syntax designed for symbol lookup:
-- **Empty query**: `moon doc `
 
+- **Empty query**: `moon doc `
   - In a module: shows all available packages in current module
   - In a package: shows all symbols in current package
   - Outside package: shows all available packages
 
 - **Function/value lookup**: `moon doc "[@pkg.]sym"`
-  
 - **Type lookup**: `moon doc "[@pkg.]Sym"`
 
 - **Method/field lookup**: `moon doc "[@pkg.]T::sym"`
@@ -1378,9 +1385,10 @@ pub fn parse_yaml(s : String) -> Yaml raise {...}
 4. **Type inspection**: Use `moon doc "TypeName"` to see type definition and methods
 5. **Package exploration**: Use `moon doc ""` at module root to see all available packages, including dependencies and stdlib
 6. **Globbing**: Use `*` wildcard for partial matches, e.g. `moon doc "String::*rev*"` to find all String methods with "rev" in their name
+
 ### Examples
 
-````bash
+```bash
 # search for String methods in standard library:
 $ moon doc "String"
 
@@ -1408,7 +1416,7 @@ pub fn new(size_hint? : Int) -> Buffer
    1.
 # ... more details omitted ...
 
-$ moon doc "String::*rev*"  
+$ moon doc "String::*rev*"
 package "moonbitlang/core/string"
 
 pub fn String::rev(String) -> String
@@ -1423,13 +1431,13 @@ pub fn String::rev_find(String, StringView) -> Int?
 
 **Best practice**: When implementing a feature, start with `moon doc` queries to discover available APIs before writing code. This is faster and more accurate than searching through files.
 
-````
+```
 
 ## `moon ide peek-def` for Definition Lookup
 
 Use this when you want inline context for a symbol without jumping files.
 
-``` file src/parse.mbt
+```file src/parse.mbt
 L45:|///|
 L46:|fn Parser::read_u32_leb128(self : Parser) -> UInt raise ParseError {
 L47:|  ...
@@ -1445,16 +1453,17 @@ Definition found at file src/parse.mbt
   |   bytes : Bytes
   |   mut pos : Int
   | }
-  | 
+  |
   | ///|
   | fn Parser::new(bytes : Bytes) -> Parser {
   |   { bytes, pos: 0 }
   | }
-  | 
+  |
   | ///|
   | fn Parser::eof(self : Parser) -> Bool {
   |   self.pos >= self.bytes.length()
   | }
-  | 
+  |
 ```
+
 For the `-loc` argument, the line number must be precise; the column can be approximate since `-symbol` helps locate the position.

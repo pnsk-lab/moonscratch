@@ -1,5 +1,5 @@
 ---
-title: "MoonBit Standard Library and External Packages"
+title: 'MoonBit Standard Library and External Packages'
 ---
 
 # MoonBit Standard Library
@@ -154,15 +154,15 @@ none.unwrap_or(0)          // 0
 
 ## Collections Overview
 
-| Type | Description | Use Case |
-|------|-------------|----------|
-| `Array[T]` | Resizable array | General purpose |
-| `FixedArray[T]` | Fixed-size array | Known size, no resize |
-| `Map[K, V]` | Ordered hash map | Key-value with insertion order |
-| `@hashmap.HashMap[K, V]` | Hash map | Fast lookup |
-| `@sorted_map.T[K, V]` | Sorted map | Ordered by keys |
-| `@list.T[T]` | Linked list | Functional programming |
-| `@deque.T[T]` | Double-ended queue | Queue/stack operations |
+| Type                     | Description        | Use Case                       |
+| ------------------------ | ------------------ | ------------------------------ |
+| `Array[T]`               | Resizable array    | General purpose                |
+| `FixedArray[T]`          | Fixed-size array   | Known size, no resize          |
+| `Map[K, V]`              | Ordered hash map   | Key-value with insertion order |
+| `@hashmap.HashMap[K, V]` | Hash map           | Fast lookup                    |
+| `@sorted_map.T[K, V]`    | Sorted map         | Ordered by keys                |
+| `@list.T[T]`             | Linked list        | Functional programming         |
+| `@deque.T[T]`            | Double-ended queue | Queue/stack operations         |
 
 ## Traits in Standard Library
 
@@ -323,9 +323,7 @@ To use `async fn main` or `async test`, you **must** import `moonbitlang/async` 
 
 ```json
 {
-  "import": [
-    "moonbitlang/async"
-  ]
+  "import": ["moonbitlang/async"]
 }
 ```
 

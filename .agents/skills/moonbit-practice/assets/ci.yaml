@@ -23,4 +23,3 @@ jobs:
         run: moon check --deny-warn
       - name: Moon test
         run: moon test
-

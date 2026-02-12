@@ -31,6 +31,7 @@ moon ide outline src/parser.mbt
 ```
 
 **Why:**
+
 - `moon ide` provides semantic search (distinguishes definitions from call sites)
 - grep picks up comments and strings
 - `moon doc` quickly reveals APIs
@@ -138,15 +139,15 @@ test "snapshot" {
 
 Available in `.mbt.md` files or `///|` inline comments.
 
-| Code Block | Behavior |
-|------------|----------|
-| ` ```mbt check ` | Checked by LSP |
-| ` ```mbt test ` | Executed as `test {...}` |
-| ` ```moonbit ` | Display only (not executed) |
+| Code Block       | Behavior                    |
+| ---------------- | --------------------------- |
+| ` ```mbt check ` | Checked by LSP              |
+| ` ```mbt test `  | Executed as `test {...}`    |
+| ` ```moonbit `   | Display only (not executed) |
 
 Example (inline comment):
 
-```moonbit
+````moonbit
 
 ///|
 /// Increment an integer by 1
@@ -156,7 +157,7 @@ Example (inline comment):
 pub fn incr(x : Int) -> Int {
   x + 1
 }
-```
+````
 
 ## Pre-release Checklist
 
@@ -179,16 +180,16 @@ moon doc Map          # Map methods
 
 ## Quick Reference
 
-| Topic | Command | Details |
-|-------|---------|---------|
-| Test | `moon test` | https://docs.moonbitlang.com/en/stable/language/tests |
-| Update snapshots | `moon test -u` | Same as above |
-| Filtered test | `moon test --filter 'glob'` | Run specific tests |
-| Benchmark | `moon bench` | https://docs.moonbitlang.com/en/stable/language/benchmarks |
-| Doc Test | `moon check` / `moon test` | https://docs.moonbitlang.com/en/stable/language/docs |
-| Format | `moon fmt` | - |
-| Generate types | `moon info` | - |
-| Doc reference | `moon doc <Type>` | - |
+| Topic            | Command                     | Details                                                    |
+| ---------------- | --------------------------- | ---------------------------------------------------------- |
+| Test             | `moon test`                 | https://docs.moonbitlang.com/en/stable/language/tests      |
+| Update snapshots | `moon test -u`              | Same as above                                              |
+| Filtered test    | `moon test --filter 'glob'` | Run specific tests                                         |
+| Benchmark        | `moon bench`                | https://docs.moonbitlang.com/en/stable/language/benchmarks |
+| Doc Test         | `moon check` / `moon test`  | https://docs.moonbitlang.com/en/stable/language/docs       |
+| Format           | `moon fmt`                  | -                                                          |
+| Generate types   | `moon info`                 | -                                                          |
+| Doc reference    | `moon doc <Type>`           | -                                                          |
 
 ## moon ide Tools
 

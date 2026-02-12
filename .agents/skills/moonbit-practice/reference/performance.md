@@ -1,5 +1,5 @@
 ---
-title: "MoonBit Performance Tuning"
+title: 'MoonBit Performance Tuning'
 ---
 
 # MoonBit Performance Tuning
@@ -8,11 +8,11 @@ title: "MoonBit Performance Tuning"
 
 View types are **zero-copy, non-owning, read-only slices**. They don't allocate memory and are ideal for passing sub-sequences without copying data.
 
-| Original Type | View Type | Slice Syntax |
-|---------------|-----------|--------------|
-| `String` | `StringView` | `s[:]`, `s[start:end]` |
-| `Bytes` | `BytesView` | `b[:]`, `b[start:end]` |
-| `Array[T]` | `ArrayView[T]` | `a[:]`, `a[start:end]` |
+| Original Type   | View Type      | Slice Syntax           |
+| --------------- | -------------- | ---------------------- |
+| `String`        | `StringView`   | `s[:]`, `s[start:end]` |
+| `Bytes`         | `BytesView`    | `b[:]`, `b[start:end]` |
+| `Array[T]`      | `ArrayView[T]` | `a[:]`, `a[start:end]` |
 | `FixedArray[T]` | `ArrayView[T]` | `a[:]`, `a[start:end]` |
 
 ## StringView
@@ -67,6 +67,7 @@ moon doc StringView
 ```
 
 Common operations:
+
 - `view.length()` - Length in code units
 - `view.to_string()` - Convert back to owned String
 - `view.iter()` - Iterate over characters
@@ -125,6 +126,7 @@ moon doc ArrayView
 ```
 
 Common operations:
+
 - `view.length()` - Number of elements
 - `view[i]` - Index access
 - `view.iter()` - Iterator

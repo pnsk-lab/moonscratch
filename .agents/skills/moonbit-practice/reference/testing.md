@@ -1,5 +1,5 @@
 ---
-title: "MoonBit Testing Reference"
+title: 'MoonBit Testing Reference'
 ---
 
 # MoonBit Testing Reference
@@ -10,11 +10,11 @@ Doc tests can be written in `.mbt.md` files or inline docstrings.
 
 ### Code Block Types
 
-| Block | Behavior |
-|-------|----------|
+| Block            | Behavior                             |
+| ---------------- | ------------------------------------ |
 | ` ```mbt check ` | Type-checked by LSP and `moon check` |
-| ` ```mbt test ` | Executed as `test {...}` block |
-| ` ```moonbit ` | Display only (not executed) |
+| ` ```mbt test `  | Executed as `test {...}` block       |
+| ` ```moonbit `   | Display only (not executed)          |
 
 ### Inline Docstring Example
 
@@ -135,9 +135,7 @@ Add to `moon.pkg.json`:
 
 ```json
 {
-  "test-import": [
-    "moonbitlang/quickcheck"
-  ]
+  "test-import": ["moonbitlang/quickcheck"]
 }
 ```
 

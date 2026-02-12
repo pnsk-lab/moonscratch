@@ -1,5 +1,5 @@
 ---
-title: "MoonBit Refactoring Patterns"
+title: 'MoonBit Refactoring Patterns'
 ---
 
 # MoonBit Refactoring Patterns

@@ -1,5 +1,5 @@
 ---
-title: "MoonBit FFI Reference"
+title: 'MoonBit FFI Reference'
 ---
 
 # MoonBit FFI Reference
@@ -53,24 +53,24 @@ extern "C" fn put_char(ch : UInt) = "putchar"
 
 ### JavaScript
 
-| MoonBit | JavaScript |
-|---------|-----------|
-| `String` | `string` |
-| `Bool` | `boolean` |
-| `Int`, `Double` | `number` |
-| `BigInt` | `bigint` |
-| `Bytes` | `Uint8Array` |
-| `Array[T]` | `T[]` |
-| `#external type` | `any` |
+| MoonBit          | JavaScript   |
+| ---------------- | ------------ |
+| `String`         | `string`     |
+| `Bool`           | `boolean`    |
+| `Int`, `Double`  | `number`     |
+| `BigInt`         | `bigint`     |
+| `Bytes`          | `Uint8Array` |
+| `Array[T]`       | `T[]`        |
+| `#external type` | `any`        |
 
 ### Wasm
 
-| MoonBit | Wasm |
-|---------|------|
-| `Bool`, `Int` | `i32` |
-| `Int64` | `i64` |
-| `Float` | `f32` |
-| `Double` | `f64` |
+| MoonBit          | Wasm        |
+| ---------------- | ----------- |
+| `Bool`, `Int`    | `i32`       |
+| `Int64`          | `i64`       |
+| `Float`          | `f32`       |
+| `Double`         | `f64`       |
 | `#external type` | `externref` |
 
 ## JavaScript FFI Patterns
@@ -134,8 +134,8 @@ extern "js" fn dirname(path : String) -> String = "dirname"
 This generates:
 
 ```javascript
-import { readFileSync } from "node:fs";
-import { basename, dirname } from "node:path";
+import { readFileSync } from 'node:fs'
+import { basename, dirname } from 'node:path'
 ```
 
 #### Default Export
@@ -150,7 +150,7 @@ extern "js" fn lodash() -> Value = "default"
 Generates:
 
 ```javascript
-import lodash from "lodash";
+import lodash from 'lodash'
 ```
 
 #### npm Packages

@@ -54,11 +54,20 @@ You can browse and install extra skills here:
 
 - Commit messages follow Conventional Commit-style prefixes (e.g., `feat:`, `fix:`, `rename:`, `feat(blocks):`). Keep them concise and action-oriented.
 - PRs should include a clear summary, link relevant issues/PRs, and add screenshots/GIFs for visible UI changes in `examples/example1`.
+
 * If you are Codex, use `Co-authored-by: chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>` in the commit message to credit the human collaborator.
-  * You have to add `--author="chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --no-gpg-sign` option to git commit command.
-  Example:
+  - You have to add `--author="chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --no-gpg-sign` option to git commit command.
+    Example:
   ```sh
     git commit -m "fix: correct minor typos in code\n\nCo-authored-by: chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --author="chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>" --no-gpg-sign
-    ```
+  ```
 * You can use git command and gh command to commit, push and create PR.
 * Use "Squash and merge" to merge the PR on GitHub.
+
+## JS
+
+- Uses Bun as runtime environment.
+- `bun run test` to run tests. `vite-plus/test` API is same as `vitest`.
+- `bun run build` to build the project.
+- `bun lint` / `bun fmt` to lint / format the code using `vite-plus` tooling.
+- `bun typecheck` to typecheck the code using `tsgo`.

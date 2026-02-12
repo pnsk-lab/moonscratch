@@ -1,5 +1,5 @@
 ---
-title: "MoonBit Configuration Reference"
+title: 'MoonBit Configuration Reference'
 ---
 
 # MoonBit Configuration Reference
@@ -60,11 +60,11 @@ options(
 
 ### Comparison with JSON
 
-| Feature | JSON Format | moon.pkg Format |
-|---------|-------------|-----------------|
-| Comments | ❌ Not supported | ✅ Supported |
-| Trailing comma | ❌ Not supported | ✅ Supported |
-| Readability | Low (verbose) | High (concise) |
+| Feature        | JSON Format      | moon.pkg Format |
+| -------------- | ---------------- | --------------- |
+| Comments       | ❌ Not supported | ✅ Supported    |
+| Trailing comma | ❌ Not supported | ✅ Supported    |
+| Readability    | Low (verbose)    | High (concise)  |
 
 ## moon.mod.json (Module Configuration)
 
@@ -213,6 +213,7 @@ format: `esm` (default), `cjs`, `iife`
 ## Warning Numbers
 
 Common ones:
+
 - `1` Unused function
 - `2` Unused variable
 - `11` Partial pattern matching

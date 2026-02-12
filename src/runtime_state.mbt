@@ -3,12 +3,24 @@ fn vm_new_internal(
   bundle : ProjectBundle,
   options : VmOptions,
 ) -> Vm raise VmError {
-  let (targets, stage_index) = parse_project_targets(bundle.project_json)
+  let (targets, stage_index) = parse_project_targets(
+    bundle.project_json,
+    bundle.assets,
+  )
+  let pen_width = if options.pen_width > 0 { options.pen_width } else { 480 }
+  let pen_height = if options.pen_height > 0 { options.pen_height } else { 360 }
+  let pen_pixels = []
+  for _ in 0..<(pen_width * pen_height * 4) {
+    pen_pixels.push(b'\x00')
+  }
   {
     targets,
     stage_index,
     assets: bundle.assets,
     options,
+    pen_width,
+    pen_height,
+    pen_pixels,
     threads: [],
     next_thread_id: 1,
     run_id: 0,
@@ -21,6 +33,13 @@ fn vm_new_internal(
     rng_state: options.seed,
     control_counter: 0,
     next_clone_id: 1,
+    hat_predicates: {},
+    timer_start_ms: 0,
+    music_tempo: 60.0,
+    tts_language: "en",
+    procedure_frames: {},
+    pending_translate_requests: {},
+    current_thread_id: None,
   }
 }
 
@@ -215,9 +234,12 @@ fn copy_string_map(source : Map[String, String]) -> Map[String, String] {
 }
 
 ///|
-fn copy_list_map(
-  source : Map[String, Array[Json]],
-) -> Map[String, Array[Json]] {
+fn copy_string_array(source : Array[String]) -> Array[String] {
+  source.copy()
+}
+
+///|
+fn copy_list_map(source : Map[String, Array[Json]]) -> Map[String, Array[Json]] {
   let out = {}
   source.each((key, value) => out[key] = value.copy())
   out
@@ -265,8 +287,27 @@ fn clone_target_state(source : TargetState, clone_id : Int) -> TargetState {
     y: source.y,
     direction: source.direction,
     size: source.size,
+    volume: source.volume,
+    music_instrument: source.music_instrument,
+    tts_voice: source.tts_voice,
     visible: source.visible,
     current_costume: source.current_costume,
+    costume_names: copy_string_array(source.costume_names),
+    costumes: source.costumes.copy(),
+    pen_down: source.pen_down,
+    pen_color: source.pen_color,
+    pen_saturation: source.pen_saturation,
+    pen_brightness: source.pen_brightness,
+    pen_transparency: source.pen_transparency,
+    pen_size: source.pen_size,
+    pen_legacy_shade: source.pen_legacy_shade,
+    looks_effect_color: source.looks_effect_color,
+    looks_effect_fisheye: source.looks_effect_fisheye,
+    looks_effect_whirl: source.looks_effect_whirl,
+    looks_effect_pixelate: source.looks_effect_pixelate,
+    looks_effect_mosaic: source.looks_effect_mosaic,
+    looks_effect_brightness: source.looks_effect_brightness,
+    looks_effect_ghost: source.looks_effect_ghost,
     variables: copy_json_map(source.variables),
     variable_names: copy_string_map(source.variable_names),
     lists: copy_list_map(source.lists),
@@ -365,6 +406,8 @@ fn spawn_thread(
 fn clear_threads(vm : Vm) -> Unit {
   vm.threads.clear()
   vm.waiting_children.clear()
+  vm.procedure_frames.clear()
+  vm.current_thread_id = None
   vm.running = false
 }
 
@@ -387,6 +430,7 @@ fn cleanup_done_threads(vm : Vm) -> Unit {
         Some(waiter) => decrement_waiting_child(vm, waiter)
         None => ()
       }
+      vm.procedure_frames.remove(thread.id)
     } else {
       survivors.push(thread)
     }

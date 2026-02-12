@@ -19,93 +19,102 @@ Scratch VM (`scratch-editor/packages/scratch-vm`) と比較した未実装 opcod
 
 ### `data_*`
 
-- [ ] `data_hidelist`
-- [ ] `data_hidevariable`
-- [ ] `data_itemnumoflist`
-- [ ] `data_showlist`
-- [ ] `data_showvariable`
+- [x] `data_hidelist` (headless no-op)
+- [x] `data_hidevariable` (headless no-op)
+- [x] `data_itemnumoflist`
+- [x] `data_showlist` (headless no-op)
+- [x] `data_showvariable` (headless no-op)
 
 ### `event_*`
 
-- [ ] `event_whenbackdropswitchesto`
-- [ ] `event_whengreaterthan`
-- [ ] `event_whenkeypressed`
-- [ ] `event_whenstageclicked`
-- [ ] `event_whenthisspriteclicked`
-- [ ] `event_whentouchingobject`
+- [x] `event_whenbackdropswitchesto`
+- [x] `event_whengreaterthan`
+- [x] `event_whenkeypressed`
+- [x] `event_whenstageclicked`
+- [x] `event_whenthisspriteclicked`
+- [x] `event_whentouchingobject`
 
 ### `looks_*`
 
-- [ ] `looks_backdropnumbername`
-- [ ] `looks_changeeffectby`
-- [ ] `looks_changestretchby`
-- [ ] `looks_cleargraphiceffects`
-- [ ] `looks_costumenumbername`
-- [ ] `looks_goforwardbackwardlayers`
-- [ ] `looks_gotofrontback`
-- [ ] `looks_hideallsprites`
-- [ ] `looks_nextbackdrop`
-- [ ] `looks_seteffectto`
-- [ ] `looks_setstretchto`
-- [ ] `looks_size`
-- [ ] `looks_switchbackdropto`
-- [ ] `looks_switchbackdroptoandwait`
+- [x] `looks_backdropnumbername`
+- [x] `looks_changeeffectby`
+- [x] `looks_changestretchby` (headless no-op)
+- [x] `looks_cleargraphiceffects`
+- [x] `looks_costumenumbername`
+- [x] `looks_goforwardbackwardlayers` (headless no-op)
+- [x] `looks_gotofrontback` (headless no-op)
+- [x] `looks_hideallsprites`
+- [x] `looks_nextbackdrop`
+- [x] `looks_seteffectto`
+- [x] `looks_setstretchto` (headless no-op)
+- [x] `looks_size`
+- [x] `looks_switchbackdropto`
+- [x] `looks_switchbackdroptoandwait`
 
 ### `motion_*`
 
-- [ ] `motion_align_scene`
-- [ ] `motion_direction`
-- [ ] `motion_glidesecstoxy`
-- [ ] `motion_glideto`
-- [ ] `motion_goto`
-- [ ] `motion_ifonedgebounce`
-- [ ] `motion_pointindirection`
-- [ ] `motion_pointtowards`
-- [ ] `motion_scroll_right`
-- [ ] `motion_scroll_up`
-- [ ] `motion_setrotationstyle`
-- [ ] `motion_xposition`
-- [ ] `motion_xscroll`
-- [ ] `motion_yposition`
-- [ ] `motion_yscroll`
+- [x] `motion_align_scene` (headless no-op)
+- [x] `motion_direction`
+- [x] `motion_glidesecstoxy`
+- [x] `motion_glideto`
+- [x] `motion_goto`
+- [x] `motion_ifonedgebounce`
+- [x] `motion_pointindirection`
+- [x] `motion_pointtowards`
+- [x] `motion_scroll_right` (headless no-op)
+- [x] `motion_scroll_up` (headless no-op)
+- [x] `motion_setrotationstyle` (headless no-op)
+- [x] `motion_xposition`
+- [x] `motion_xscroll` (returns `0`)
+- [x] `motion_yposition`
+- [x] `motion_yscroll` (returns `0`)
 
 ### `procedures_*`
 
-- [ ] `procedures_call`
-- [ ] `procedures_definition`
+- [x] `procedures_call`
+- [x] `procedures_definition`
 
 ### `sensing_*`
 
-- [ ] `sensing_coloristouchingcolor`
-- [ ] `sensing_current`
-- [ ] `sensing_dayssince2000`
-- [ ] `sensing_distanceto`
-- [ ] `sensing_keypressed`
-- [ ] `sensing_loud`
-- [ ] `sensing_loudness`
-- [ ] `sensing_mousedown`
-- [ ] `sensing_mousex`
-- [ ] `sensing_mousey`
-- [ ] `sensing_of`
-- [ ] `sensing_online`
-- [ ] `sensing_resettimer`
-- [ ] `sensing_touchingcolor`
-- [ ] `sensing_touchingobject`
-- [ ] `sensing_userid`
-- [ ] `sensing_username`
+- [x] `sensing_coloristouchingcolor`
+- [x] `sensing_current`
+- [x] `sensing_dayssince2000`
+- [x] `sensing_distanceto`
+- [x] `sensing_keypressed`
+- [x] `sensing_loud`
+- [x] `sensing_loudness`
+- [x] `sensing_mousedown`
+- [x] `sensing_mousex`
+- [x] `sensing_mousey`
+- [x] `sensing_of`
+- [x] `sensing_online`
+- [x] `sensing_resettimer`
+- [x] `sensing_touchingcolor`
+- [x] `sensing_touchingobject`
+- [x] `sensing_userid`
+- [x] `sensing_username`
 
 ### `sound_*`
 
-- [ ] `sound_beats_menu`
-- [ ] `sound_changeeffectby`
-- [ ] `sound_changevolumeby`
-- [ ] `sound_cleareffects`
-- [ ] `sound_effects_menu`
-- [ ] `sound_seteffectto`
-- [ ] `sound_setvolumeto`
-- [ ] `sound_sounds_menu`
-- [ ] `sound_volume`
+- [x] `sound_beats_menu`
+- [x] `sound_changeeffectby`
+- [x] `sound_changevolumeby`
+- [x] `sound_cleareffects`
+- [x] `sound_effects_menu`
+- [x] `sound_seteffectto`
+- [x] `sound_setvolumeto`
+- [x] `sound_sounds_menu`
+- [x] `sound_volume`
 
-## Extensions (not started)
+## Extensions
 
-`pen_*`, `music_*`, `videoSensing_*`, `text2speech_*`, `translate_*`, `wedo2_*`, `ev3_*`, `boost_*`, `gdxfor_*`, `makeymakey_*`, `microbit_*`, `faceSensing_*`
+### Implemented
+
+- `music_*` (`playDrumForBeats`, `midiPlayDrumForBeats`, `restForBeats`, `playNoteForBeats`, `setInstrument`, `midiSetInstrument`, `setTempo`, `changeTempo`, `getTempo`)
+- `pen_*` (`clear`, `stamp`, `penDown`, `penUp`, `setPenColorToColor`, `changePenColorParamBy`, `setPenColorParamTo`, `changePenSizeBy`, `setPenSizeTo`, `setPenHueToNumber`, `changePenHueBy`, `setPenShadeToNumber`, `changePenShadeBy`)
+- `text2speech_*` (`speakAndWait`, `setVoice`, `setLanguage`)
+- `translate_*` (`getTranslate`, `getViewerLanguage`)
+
+### Not started
+
+`videoSensing_*`, `wedo2_*`, `ev3_*`, `boost_*`, `gdxfor_*`, `makeymakey_*`, `microbit_*`, `faceSensing_*`

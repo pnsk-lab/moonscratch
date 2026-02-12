@@ -1,7 +1,6 @@
 ---
-title: "moon ide"
+title: 'moon ide'
 ---
-
 
 ## Code Navigation with `moon ide`
 
