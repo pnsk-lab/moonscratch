@@ -56,3 +56,53 @@ export const fromRgbaMatrix = (pixels: RgbaMatrix): RgbaAsset => {
 
   return buildAsset(width, height, flat)
 }
+
+type SharpNamespace = {
+  default?: (input?: unknown) => SharpPipeline
+}
+
+type SharpPipeline = {
+  ensureAlpha(): SharpPipeline
+  raw(): SharpPipeline
+  toBuffer(options: { resolveWithObject: true }): Promise<{
+    data: Uint8Array
+    info: {
+      width: number
+      height: number
+    }
+  }>
+}
+
+const loadSharp = async (): Promise<(input?: unknown) => SharpPipeline> => {
+  try {
+    const sharp = (await import('sharp')) as SharpNamespace
+    return (
+      sharp.default ??
+      ((sharp as unknown as { sharp?: (input?: unknown) => SharpPipeline }).sharp as
+        | ((input?: unknown) => SharpPipeline)
+        | undefined) ??
+      (() => {
+        throw new Error('invalid sharp module shape')
+      })
+    )
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    throw new Error(`sharp is required to load image assets: ${reason}`)
+  }
+}
+
+const fromSharpPipeline = async (pipeline: SharpPipeline): Promise<RgbaAsset> => {
+  const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  return fromRgbaBytes(info.width, info.height, data)
+}
+
+export const fromImageBytes = async (bytes: ArrayBuffer | Uint8Array): Promise<RgbaAsset> => {
+  const sharp = await loadSharp()
+  const normalized = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+  return fromSharpPipeline(sharp(normalized))
+}
+
+export const fromImageFile = async (path: string): Promise<RgbaAsset> => {
+  const sharp = await loadSharp()
+  return fromSharpPipeline(sharp(path))
+}

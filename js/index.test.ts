@@ -14,5 +14,7 @@ describe('moonscratch/js/index.ts', () => {
     expect(index.fromImageData).toBe(assetsIndex.fromImageData)
     expect(index.fromCanvas).toBe(assetsIndex.fromCanvas)
     expect(index.fromRgbaMatrix).toBe(assetsIndex.fromRgbaMatrix)
+    expect(index.fromImageBytes).toBe(assetsIndex.fromImageBytes)
+    expect(index.fromImageFile).toBe(assetsIndex.fromImageFile)
   })
 })

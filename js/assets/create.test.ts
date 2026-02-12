@@ -1,6 +1,39 @@
 import { describe, expect, test, vi } from 'vite-plus/test'
 
-import { fromCanvas, fromImageData, fromRgbaBytes, fromRgbaMatrix } from './create.ts'
+import {
+  fromCanvas,
+  fromImageBytes,
+  fromImageData,
+  fromImageFile,
+  fromRgbaBytes,
+  fromRgbaMatrix,
+} from './create.ts'
+
+const sharpCalls: unknown[] = []
+
+vi.mock('sharp', () => ({
+  default: vi.fn((input?: unknown) => {
+    sharpCalls.push(input)
+
+    return {
+      ensureAlpha() {
+        return this
+      },
+      raw() {
+        return this
+      },
+      async toBuffer() {
+        return {
+          data: new Uint8Array([0, 255, 0, 255]),
+          info: {
+            width: 1,
+            height: 1,
+          },
+        }
+      },
+    }
+  }),
+}))
 
 describe('moonscratch/js/assets/create.ts', () => {
   test('builds an asset from image data', () => {
@@ -76,5 +109,27 @@ describe('moonscratch/js/assets/create.ts', () => {
         [[0, 0, 0, 255]],
       ]),
     ).toThrow('pixels[1] must contain exactly 2 columns')
+  })
+
+  test('loads an image asset from bytes via sharp', async () => {
+    const asset = await fromImageBytes(new Uint8Array([1, 2, 3]))
+
+    expect(sharpCalls).toEqual([new Uint8Array([1, 2, 3])])
+    expect(asset).toEqual({
+      width: 1,
+      height: 1,
+      rgbaBase64: 'AP8A/w==',
+    })
+  })
+
+  test('loads an image asset from file via sharp', async () => {
+    const asset = await fromImageFile('fixtures/example.png')
+
+    expect(sharpCalls).toEqual([new Uint8Array([1, 2, 3]), 'fixtures/example.png'])
+    expect(asset).toEqual({
+      width: 1,
+      height: 1,
+      rgbaBase64: 'AP8A/w==',
+    })
   })
 })
