@@ -8,8 +8,8 @@ fn repeat_frame(
 }
 
 ///|
-fn forever_frame(substack : String?) -> ControlFrame {
-  { kind: ControlFrameKind::Forever, remaining: 0, substack, after: None }
+fn forever_frame(substack : String?, after : String?) -> ControlFrame {
+  { kind: ControlFrameKind::Forever, remaining: 0, substack, after }
 }
 
 ///|
@@ -329,7 +329,15 @@ fn unwind_control(vm : Vm, thread : Thread) -> Thread {
             } else {
               thread.pc = frame.after
             }
-          ControlFrameKind::Forever => thread.pc = frame.substack
+          ControlFrameKind::Forever =>
+            match frame.substack {
+              Some(substack) => {
+                // Re-push forever frame so the loop does not terminate after one unwind.
+                thread.stack.push(frame)
+                thread.pc = Some(substack)
+              }
+              None => thread.pc = frame.after
+            }
         }
       None =>
         match pop_procedure_frame(vm, thread.id) {
@@ -2151,7 +2159,7 @@ fn execute_thread_once(vm : Vm, thread : Thread) -> Thread {
       }
     "control_forever" => {
       let substack = block_input_block_id(block, "SUBSTACK")
-      thread.stack.push(forever_frame(substack))
+      thread.stack.push(forever_frame(substack, Some(block.id)))
       next_pc = substack
     }
     "control_if" => {

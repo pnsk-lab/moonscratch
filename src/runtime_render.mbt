@@ -740,6 +740,89 @@ fn render_sample_scene_without_target(
 }
 
 ///|
+fn render_rgba_eq(
+  left : (Int, Int, Int, Int),
+  right : (Int, Int, Int, Int),
+) -> Bool {
+  left.0 == right.0 &&
+  left.1 == right.1 &&
+  left.2 == right.2 &&
+  left.3 == right.3
+}
+
+///|
+fn render_svg_append_rect(
+  svg : StringBuilder,
+  x : Int,
+  y : Int,
+  width : Int,
+  rgba : (Int, Int, Int, Int),
+) -> Unit {
+  let (r, g, b, a) = rgba
+  if width <= 0 || a <= 0 {
+    return
+  }
+  svg.write_string("<rect x=\"")
+  svg.write_object(x)
+  svg.write_string("\" y=\"")
+  svg.write_object(y)
+  svg.write_string("\" width=\"")
+  svg.write_object(width)
+  svg.write_string("\" height=\"1\" fill=\"rgb(")
+  svg.write_object(r)
+  svg.write_string(",")
+  svg.write_object(g)
+  svg.write_string(",")
+  svg.write_object(b)
+  svg.write_string(")\"")
+  if a < 255 {
+    svg.write_string(" fill-opacity=\"")
+    svg.write_object(Double::from_int(a) / 255.0)
+    svg.write_string("\"")
+  }
+  svg.write_string("/>")
+}
+
+///|
+fn render_scene_to_svg(vm : Vm) -> String {
+  let svg = StringBuilder::new()
+  svg.write_string("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"")
+  svg.write_object(vm.pen_width)
+  svg.write_string("\" height=\"")
+  svg.write_object(vm.pen_height)
+  svg.write_string("\" viewBox=\"0 0 ")
+  svg.write_object(vm.pen_width)
+  svg.write_string(" ")
+  svg.write_object(vm.pen_height)
+  svg.write_string("\" shape-rendering=\"crispEdges\">")
+
+  for py in 0..<vm.pen_height {
+    let mut px = 0
+    while px < vm.pen_width {
+      let color = render_sample_scene_without_target(vm, -1, px, py)
+      let mut run_width = 1
+      while px + run_width < vm.pen_width {
+        let next = render_sample_scene_without_target(
+          vm,
+          -1,
+          px + run_width,
+          py,
+        )
+        if !render_rgba_eq(color, next) {
+          break
+        }
+        run_width += 1
+      }
+      render_svg_append_rect(svg, px, py, run_width, color)
+      px += run_width
+    }
+  }
+
+  svg.write_string("</svg>")
+  svg.to_string()
+}
+
+///|
 fn render_mask_matches(
   sampled : (Int, Int, Int, Int),
   mask_rgb : (Int, Int, Int),

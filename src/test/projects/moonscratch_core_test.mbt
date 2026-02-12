@@ -620,6 +620,56 @@ let motion_project =
   #|}
 
 ///|
+let forever_motion_project =
+  #|{
+  #|  "targets": [
+  #|    {
+  #|      "isStage": true,
+  #|      "name": "Stage",
+  #|      "variables": {},
+  #|      "lists": {},
+  #|      "blocks": {}
+  #|    },
+  #|    {
+  #|      "isStage": false,
+  #|      "name": "Sprite1",
+  #|      "variables": {},
+  #|      "lists": {},
+  #|      "blocks": {
+  #|        "hat_flag": {
+  #|          "opcode": "event_whenflagclicked",
+  #|          "next": "forever_loop",
+  #|          "parent": null,
+  #|          "inputs": {},
+  #|          "fields": {},
+  #|          "topLevel": true
+  #|        },
+  #|        "forever_loop": {
+  #|          "opcode": "control_forever",
+  #|          "next": null,
+  #|          "parent": "hat_flag",
+  #|          "inputs": {
+  #|            "SUBSTACK": [2, "move_steps"]
+  #|          },
+  #|          "fields": {},
+  #|          "topLevel": false
+  #|        },
+  #|        "move_steps": {
+  #|          "opcode": "motion_movesteps",
+  #|          "next": null,
+  #|          "parent": "forever_loop",
+  #|          "inputs": {
+  #|            "STEPS": [1, [4, 1]]
+  #|          },
+  #|          "fields": {},
+  #|          "topLevel": false
+  #|        }
+  #|      }
+  #|    }
+  #|  ]
+  #|}
+
+///|
 test "control repeat_until, for_each and counter reporter" {
   let vm = unwrap_result(
     try? @moonscratch.vm_new_from_json(control_project),
@@ -654,6 +704,37 @@ test "control repeat_until, for_each and counter reporter" {
   assert_eq(vars["var_counter"], Json::number(3.0))
   assert_eq(vars["var_sum"], Json::number(6.0))
   assert_eq(vars["var_i"], Json::number(3.0))
+}
+
+///|
+test "control forever keeps repeating substack blocks" {
+  let vm = unwrap_result(
+    try? @moonscratch.vm_new_from_json(forever_motion_project),
+    "vm init failed",
+  )
+  @moonscratch.vm_green_flag(vm)
+
+  for _ in 0..<20 {
+    ignore(@moonscratch.vm_step(vm, 16))
+  }
+
+  let snapshot = unwrap_result(
+    try? @json.parse(@moonscratch.vm_snapshot_json(vm)),
+    "snapshot parse failed",
+  )
+  let root_obj = match snapshot {
+    Object(obj) => obj
+    _ => fail("snapshot must be object")
+  }
+  let targets = match root_obj["targets"] {
+    Array(items) => items
+    _ => fail("targets must be array")
+  }
+  let sprite = match targets[1] {
+    Object(obj) => obj
+    _ => fail("sprite must be object")
+  }
+  assert_eq(sprite["x"], Json::number(19.0))
 }
 
 ///|

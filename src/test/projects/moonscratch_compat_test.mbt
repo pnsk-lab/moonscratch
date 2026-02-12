@@ -592,3 +592,26 @@ test "pen opcodes draw into headless buffer and touching color reporters read it
     }
   }
 }
+
+///|
+test "render_svg outputs composited scene colors" {
+  let vm = unwrap_result(
+    try? @moonscratch.vm_new_from_json(
+      pen_touching_project,
+      assets_json=pen_touching_assets,
+    ),
+    "vm init failed",
+  )
+  @moonscratch.vm_green_flag(vm)
+  for _ in 0..<60 {
+    ignore(@moonscratch.vm_step(vm, 16))
+  }
+
+  let svg = @moonscratch.vm_render_svg(vm)
+  assert_true(svg.contains("<svg"))
+  assert_true(svg.contains("shape-rendering=\"crispEdges\""))
+  assert_true(svg.contains("rgb(0,255,0)"))
+  assert_true(svg.contains("rgb(255,0,0)"))
+  assert_true(svg.contains("rgb(0,0,255)"))
+  assert_true(svg.contains("</svg>"))
+}

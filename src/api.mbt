@@ -55,3 +55,8 @@ pub fn vm_take_effects_json(vm : Vm) -> String {
 pub fn vm_snapshot_json(vm : Vm) -> String {
   snapshot_to_json(vm).stringify(indent=2)
 }
+
+///|
+pub fn vm_render_svg(vm : Vm) -> String {
+  render_scene_to_svg(vm)
+}

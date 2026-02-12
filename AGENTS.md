@@ -15,6 +15,8 @@ You can browse and install extra skills here:
 - In the toplevel directory, there is a `moon.mod.json` file listing module
   metadata.
 
+* src/ にあるテストはユニットテストのみで、マクロなテストは test/ に書く
+
 ## Coding convention
 
 - MoonBit code is organized in block style, each block is separated by `///|`,
